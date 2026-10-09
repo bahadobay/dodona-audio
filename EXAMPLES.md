@@ -8,10 +8,17 @@ from dodona import Dodona
 model = Dodona()
 ```
 
-Each question has a name you choose and a type: `noul` (yes/no), `choice` or `score`. Ask a
-catalogue question by its name (`"angry": {}`) or any word (`{"type": "noul", "word": "refund"}`)
-and the answer is **calibrated**: when Dodona says 0.8, it is right about 80% of the time.
-Questions in your own words are answered too, marked `"off catalogue"`.
+Each question has a name you choose and one of three types:
+- `noul`: a yes/no question, answered with the probability of yes;
+- `choice`: pick one of several options, answered with a probability for each;
+- `score`: a choice whose options are ordered from lowest to highest. Dodona reads the
+  probability of each option and `score` is the expected level (0 is the first option).
+
+Write your own questions with `instructions` (and `criteria` for choice and score); they are
+answered and marked `"off catalogue"`: not tested on your wording. For the most common
+questions there are built-in shortcuts: ask one by its name (`"angry": {}`) or ask for any word
+(`{"type": "noul", "word": "refund"}`), and the answer is **calibrated**: when Dodona says 0.8,
+it is right about 80% of the time.
 
 ## 1. Two minutes of a meeting
 
@@ -19,8 +26,9 @@ AMI Meeting Corpus, `ES2002a.Mix-Headset.wav`, 50 to 170 s. Four people design a
 
 ```python
 result = model.ask("meeting.wav", {
-    "laughs":     {},
-    "n_speakers": {},
+    "laughs":     {"type": "noul", "instructions": "Someone laughs in this recording."},
+    # a built-in choice question brings its own options: one, two, three_or_more
+    "n_speakers": {"type": "choice", "instructions": "How many distinct speakers are in this recording?"},
     "remote":     {"type": "noul", "word": "remote"},
     "disagree":   {"type": "noul", "instructions": "Does someone disagree with another person?"},
     "topic":      {"type": "choice", "instructions": "What is this meeting about?",
@@ -65,7 +73,8 @@ How to read it:
   at 60 to 70 s. In the first 10 seconds alone, neither happens (0.033, 0.01).
 - **Choice and score answers are averages over the windows.** `n_speakers` says "one" (0.43)
   although four people take part: it describes 10-second stretches, not the meeting.
-- **`score` is the expected level**, 0.828 on a scale from 0 (low) to 2 (high).
+- **`score` is the expected level**, 0.828 on a scale from 0 (low) to 2 (high): the
+  probabilities of the three options (0.426, 0.32, 0.254) weighted by their level.
 - **`disagreement`**, in each window, is how far Dodona's two adapters are apart. Near 0: they
   agree. High: Dodona is guessing.
 
@@ -76,8 +85,9 @@ there is one window, and its answers are the answers.
 
 ```python
 model.ask("angry.wav", {
-    "emotion": {},
-    "angry":   {},
+    # a built-in choice question brings its own options: angry, happy, sad, neutral, fear, disgust
+    "emotion": {"type": "choice", "instructions": "Which emotion is the speaker expressing?"},
+    "angry":   {"type": "noul", "instructions": "The speaker sounds angry in this recording."},
     "upset":   {"type": "score", "instructions": "How upset is the speaker?",
                 "criteria": ["calm", "annoyed", "very upset"]},
 })
@@ -94,8 +104,9 @@ model.ask("angry.wav", {
 }
 ```
 
-The catalogue questions are clear (`angry` 0.99, the two adapters' disagreement 0.0). The
-question of our own, `upset`, lands between "annoyed" and "very upset", and its window shows
+`emotion` is a `choice` (one of six emotions) and `angry` a `noul` (yes/no); both are built-in
+questions and clear (`angry` 0.99, the two adapters' disagreement 0.0). `upset` is a `score`
+question of our own, and it lands between "annoyed" and "very upset" (1.247). Its window shows
 a disagreement of 0.528: the two adapters answer it differently, so read it as a guess.
 
 ## 3. A short happy sentence
@@ -115,7 +126,7 @@ CREMA-D, `1001_WSI_HAP_XX.wav` (2.3 s), the same actor, happily, same questions.
 
 Emotion was learned from actors reading 12 sentences; on natural speech it is not verified.
 
-## What can be asked by name
+## The built-in questions
 
 ```python
 model.questions()

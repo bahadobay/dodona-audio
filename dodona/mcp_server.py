@@ -48,6 +48,7 @@ def ask(audio_path: str, questions: dict) -> dict:
        "criteria": {"refund": "Money back", "help": "Technical help"}}
       {"type": "score", "instructions": "How upset is the caller?",
        "criteria": ["calm", "annoyed", "very upset"]}
+    A choice or score question has 2 to 8 options. A malformed question is refused with a message.
 
     Returns {"model", "duration", "answers", "windows"}. A noul answer is the probability of
     "yes" in the recording's highest 10 s window, with "where" that window is; choice and score

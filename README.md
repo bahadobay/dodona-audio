@@ -21,15 +21,16 @@ from dodona import Dodona
 
 model = Dodona()
 result = model.ask("meeting.wav", {
-    "laughs":     {},                                  # catalogue question (yes/no)
-    "n_speakers": {},                                  # catalogue question (choice)
+    "laughs":     {"type": "noul", "instructions": "Someone laughs in this recording."},
+    # a built-in choice question brings its own options: one, two, three_or_more
+    "n_speakers": {"type": "choice", "instructions": "How many distinct speakers are in this recording?"},
     "remote":     {"type": "noul", "word": "remote"},  # was this word said? (noul = yes/no)
     "disagree":   {"type": "noul", "instructions": "Does someone disagree with another person?"},
     "topic":      {"type": "choice", "instructions": "What is this meeting about?",
                    "criteria": {"design": "Designing a product", "money": "A budget or prices",
                                 "other": "Something else"}},
     "energy":     {"type": "score", "instructions": "How lively is the conversation?",
-                   "criteria": ["low", "mid", "high"]},
+                   "criteria": ["low", "mid", "high"]},   # score: options from lowest to highest
 })
 ```
 
@@ -56,8 +57,11 @@ How to read it:
 - **`n_speakers` "one" (0.43):** choice and score answers are averaged over the 10-second
   windows, so this is about 10-second stretches, not the meeting: four people take part in it.
 - **`score` 0.828:** the expected level, between 0 (low) and 2 (high); `legend` names them.
-- **`status`:** catalogue questions and words are `calibrated`, so 0.93 means right about 93%
-  of the time. Your own questions are `off catalogue`: answered, not verified.
+  Dodona reads the probability of each option (0.426 low, 0.32 mid, 0.254 high) and the score
+  is their weighted average.
+- **`status`:** the built-in questions (`laughs`, `n_speakers`) and words are `calibrated`, so
+  0.93 means right about 93% of the time. Your own questions say `off catalogue`: answered,
+  but not tested on your wording.
 - **`result["windows"]`** has the same answers for every 10 seconds, plus how much Dodona's two
   adapters `disagree` (high means it is guessing).
 
@@ -90,15 +94,22 @@ Name each question and give it one of three types:
 
 | type | you give | you get |
 |---|---|---|
-| `noul` (yes/no) | `instructions`, or a `word` | `noul`: probability of yes |
+| `noul` (yes/no) | `instructions` (or a `word`); optional `criteria` {"false": ..., "true": ...} to word the two answers | `noul`: probability of yes |
 | `choice` | `instructions`, `criteria` {name: description} | `choice`, `probabilities` |
 | `score` | `instructions`, `criteria` [lowest, ..., highest] | `score` (expected level), `probabilities`, `legend` |
 
-- **Catalogue questions:** `model.questions()` lists the 46 questions Dodona was trained and
-  calibrated on; ask them by name: `"angry": {}`.
+A `score` is an ordered `choice`: Dodona reads the probability of each option, and `score` is
+the expected level (0 is the first option). `choice` and `score` take 2 to 8 options. A
+question that does not fit this table is refused with a message saying what is wrong.
+
+- **Your own questions:** write them like the table says. They are answered and marked
+  `"off catalogue"`: not tested on your wording. For concepts Dodona was trained on, your own
+  wording works as well as the built-in question ("Is the speaker angry?": AUROC 0.982 against 0.974).
 - **Any word:** `{"type": "noul", "word": "refund"}`, calibrated for words never seen in training too.
-- **Your own questions:** answered and marked `"off catalogue"`. For trained concepts, your own
-  wording works as well as the catalogue's ("Is the speaker angry?": AUROC 0.982 against 0.974).
+- **Built-in questions:** `model.questions()` lists the 46 questions Dodona was trained and
+  calibrated on. Ask one with its exact wording (`laughs` and `n_speakers` above are two; a
+  choice then brings its own options), or by name alone as a shortcut: `"angry": {}`. Their
+  answers are marked `calibrated`.
 
 **Long audio** is read in 10-second windows. A yes/no answer is the most likely window, with
 `where` it is; choice and score answers are averaged. `result["windows"]` holds every window's

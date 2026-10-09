@@ -169,8 +169,12 @@ class Dodona:
     def ask(self, audio, questions):
         """{"model", "duration", "answers", "windows"} for a path (or a 16 kHz array) and a
         dict of typed questions {name: spec} (see dodona.catalog)."""
-        waveform = load_audio(audio)
         asked = [self.catalog.resolve(name, spec) for name, spec in questions.items()]
+        if not asked:
+            raise ValueError("ask at least one question")
+        waveform = load_audio(audio)
+        if len(waveform) == 0:
+            raise ValueError("the audio is empty")
         windows = []
         for start, piece in windows_of(waveform):
             first, second = self.probabilities(piece, asked)

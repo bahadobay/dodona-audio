@@ -22,6 +22,7 @@ import numpy as np
 WORD = re.compile(r'^\s*the word\s+["“]?(.+?)["”]?\s+is said in this recording\.?\s*$', re.IGNORECASE)
 WORD_TEMPLATE = 'The word "{word}" is said in this recording.'
 TYPES = {"yes/no": "noul", "choice": "choice", "score": "score"}
+MOST_OPTIONS = 8  # the answer letters A to H (dodona.model.LETTERS)
 
 
 def normal(text):
@@ -44,6 +45,30 @@ def noul(name, statement, map, status, id=None, texts=("no", "yes")):
     """A yes/no question; a statement is asked as the model was trained: "Is this true ...?"."""
     line = statement if statement.rstrip().endswith("?") else f"Is this true of the excerpt? {statement}"
     return Question(name, "noul", line, ["no", "yes"], list(texts), map, status, id)
+
+
+def own_question(name, text, kind, criteria):
+    """A question of the user's own (not in the catalogue): its type and criteria are checked."""
+    if kind not in ("noul", "choice", "score"):
+        raise ValueError(f"{name!r}: type must be noul, choice or score, not {kind!r}")
+    if kind == "noul":
+        if criteria is None:
+            return noul(name, text, "off catalogue", "off catalogue")
+        if not (isinstance(criteria, dict) and {"false", "true"} <= criteria.keys()):
+            raise ValueError(f'{name!r}: a noul question\'s criteria are {{"false": ..., "true": ...}}')
+        return noul(name, text, "off catalogue", "off catalogue", texts=(criteria["false"], criteria["true"]))
+    shape = "{name: description}" if kind == "choice" else "[lowest, ..., highest]"
+    if not isinstance(criteria, (dict, list, tuple)) or (kind == "score" and isinstance(criteria, dict)):
+        raise ValueError(f"{name!r}: a {kind} question needs criteria {shape}")
+    if not 2 <= len(criteria) <= MOST_OPTIONS:
+        raise ValueError(f"{name!r}: a {kind} question has 2 to {MOST_OPTIONS} options, not {len(criteria)}")
+    if kind == "score":
+        return Question(name, kind, text, [str(i) for i in range(len(criteria))], list(criteria),
+                        "off catalogue", "off catalogue")
+    if len(set(criteria)) != len(criteria):
+        raise ValueError(f"{name!r}: the options of a choice question must differ from each other")
+    criteria = criteria if isinstance(criteria, dict) else {c: c for c in criteria}
+    return Question(name, kind, text, list(criteria), list(criteria.values()), "off catalogue", "off catalogue")
 
 
 class Catalog:
@@ -78,30 +103,34 @@ class Catalog:
 
     def resolve(self, name, spec):
         """The Question to ask for one entry of the request: `name` and its spec."""
-        if spec.get("word"):
-            word = spec["word"].strip().lower()
+        if not isinstance(spec, dict):
+            raise ValueError(f"{name!r}: a question is a dict such as {{}} or "
+                             f"{{\"type\": \"noul\", \"instructions\": \"...\"}}, not {spec!r}")
+        if "word" in spec:
+            word = spec["word"]
+            if not isinstance(word, str) or not word.strip():
+                raise ValueError(f"{name!r}: word must be a non-empty string, not {word!r}")
+            word = word.strip().lower()
             return noul(name, WORD_TEMPLATE.format(word=word), "words", self.words_status, f"says_{word}")
         text = spec.get("instructions")
-        if not text:
+        if text is None:
             if name not in self.rows:
                 raise ValueError(f"{name!r}: no instructions, and not a catalogue name (see Dodona.questions())")
-            return self.from_row(name, self.rows[name])
+            return self.catalogue_question(name, self.rows[name], spec)
+        if not isinstance(text, str) or not text.strip():
+            raise ValueError(f"{name!r}: instructions must be a non-empty string, not {text!r}")
         found = WORD.match(text)
         if found:
             return self.resolve(name, {"word": found.group(1)})
         if normal(text) in self.rows and "criteria" not in spec:
-            return self.from_row(name, self.rows[normal(text)])
-        kind, criteria = spec.get("type", "noul"), spec.get("criteria")
-        if kind == "noul":
-            texts = (criteria["false"], criteria["true"]) if criteria else ("no", "yes")
-            return noul(name, text, "off catalogue", "off catalogue", texts=texts)
-        if kind == "choice":
-            criteria = criteria if isinstance(criteria, dict) else {c: c for c in criteria}
-            return Question(name, "choice", text, list(criteria), list(criteria.values()), "off catalogue", "off catalogue")
-        if kind == "score":
-            return Question(name, "score", text, [str(i) for i in range(len(criteria))], list(criteria),
-                            "off catalogue", "off catalogue")
-        raise ValueError(f"{name!r}: type must be noul, choice or score, not {kind!r}")
+            return self.catalogue_question(name, self.rows[normal(text)], spec)
+        return own_question(name, text, spec.get("type", "noul"), spec.get("criteria"))
+
+    def catalogue_question(self, name, row, spec):
+        kind = TYPES[row["kind"]]
+        if spec.get("type", kind) != kind:
+            raise ValueError(f"{name!r} is a {kind} catalogue question, not {spec['type']!r}")
+        return self.from_row(name, row)
 
     def calibrate(self, question, p, disagreement):
         """Calibrated probabilities from the two adapters' mean `p` and their disagreement."""
