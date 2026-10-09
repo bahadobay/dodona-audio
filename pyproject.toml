@@ -1,0 +1,29 @@
+[project]
+name = "dodona-audio"
+version = "1.0.0"
+description = "Ask yes/no and multiple-choice questions about speech; get calibrated probabilities"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+dependencies = [
+    "torch>=2.8",
+    "transformers>=5.0",    # the release was trained and checked with 5.17
+    "peft>=0.21",
+    "huggingface_hub",
+    "soundfile",
+    "scipy",
+    "numpy",
+]
+
+[project.optional-dependencies]
+mcp = ["mcp>=2.3"]
+
+[project.scripts]
+dodona-mcp = "dodona.mcp_server:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["dodona"]

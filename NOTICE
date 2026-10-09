@@ -1,0 +1,35 @@
+Dodona
+Copyright 2026 Baha Dobay
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Base model
+----------
+Dodona's adapters are LoRA weights for Qwen2-Audio-7B-Instruct
+(https://huggingface.co/Qwen/Qwen2-Audio-7B-Instruct) by the Qwen team, Alibaba Cloud,
+licensed under the Apache License, Version 2.0. The base model is not redistributed here;
+it is downloaded from its own repository. Dodona changes it by adding two LoRA adapters
+and a calibration layer on its answer probabilities.
+
+Training data
+-------------
+The adapters and the calibration maps were fitted on the following corpora. None of their
+audio, transcripts or labels is redistributed here.
+
+AMI Meeting Corpus
+  https://groups.inf.ed.ac.uk/ami/corpus/
+  Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
+  Carletta, J. et al. (2005). The AMI Meeting Corpus: A Pre-announcement.
+  Machine Learning for Multimodal Interaction (MLMI).
+
+CREMA-D (Crowd-sourced Emotional Multimodal Actors Dataset)
+  https://github.com/CheyneyComputerScience/CREMA-D
+  Contains information from CREMA-D, which is made available under the Open Database
+  License (ODbL) v1.0; its contents under the Database Contents License (DbCL) v1.0.
+  Cao, H. et al. (2014). CREMA-D: Crowd-sourced Emotional Multimodal Actors Dataset.
+  IEEE Transactions on Affective Computing, 5(4), 377-390.
+
+Common Voice (Scripted Speech 27.0 and Spontaneous Speech, English)
+  https://commonvoice.mozilla.org
+  Released under CC0 1.0 by the Mozilla Foundation.
+  Ardila, R. et al. (2020). Common Voice: A Massively-Multilingual Speech Corpus. LREC.
