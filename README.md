@@ -14,32 +14,52 @@ a probability you can trust.
 
 ## What you send, what you get
 
+Two minutes of a real meeting (AMI corpus, ES2002a, 50 to 170 s), six questions:
+
 ```python
 from dodona import Dodona
 
 model = Dodona()
-result = model.ask("call.wav", {
-    "angry":  {},                                     # a question from the catalogue
-    "refund": {"type": "noul", "word": "refund"},     # was this word said?
-    "intent": {"type": "choice", "instructions": "What does the caller want?",
-               "criteria": {"refund": "Money back", "help": "Technical help", "other": "Something else"}},
-    "upset":  {"type": "score", "instructions": "How upset is the caller?",
-               "criteria": ["calm", "annoyed", "very upset"]},
+result = model.ask("meeting.wav", {
+    "laughs":     {},                                  # catalogue question (yes/no)
+    "n_speakers": {},                                  # catalogue question (choice)
+    "remote":     {"type": "noul", "word": "remote"},  # was this word said? (noul = yes/no)
+    "disagree":   {"type": "noul", "instructions": "Does someone disagree with another person?"},
+    "topic":      {"type": "choice", "instructions": "What is this meeting about?",
+                   "criteria": {"design": "Designing a product", "money": "A budget or prices",
+                                "other": "Something else"}},
+    "energy":     {"type": "score", "instructions": "How lively is the conversation?",
+                   "criteria": ["low", "mid", "high"]},
 })
 ```
 
+The real output (`result["answers"]`; one NVIDIA L40S, 12 windows):
+
 ```json
 {
-  "angry":  {"type": "noul", "noul": 0.82, "where": [20.0, 30.0], "status": "calibrated"},
-  "refund": {"type": "noul", "noul": 0.91, "where": [30.0, 40.0], "status": "calibrated"},
-  "intent": {"type": "choice", "choice": "refund",
-             "probabilities": {"refund": 0.64, "help": 0.29, "other": 0.07}, "status": "off catalogue"},
-  "upset":  {"type": "score", "score": 1.1, "probabilities": {"0": 0.31, "1": 0.27, "2": 0.42},
-             "legend": {"0": "calm", "1": "annoyed", "2": "very upset"}, "status": "off catalogue"}
+  "laughs":     {"type": "noul", "noul": 0.93, "where": [40.0, 50.0], "status": "calibrated"},
+  "n_speakers": {"type": "choice", "choice": "one",
+                 "probabilities": {"one": 0.43, "two": 0.34, "three_or_more": 0.23}, "status": "calibrated"},
+  "remote":     {"type": "noul", "noul": 0.99, "where": [60.0, 70.0], "status": "calibrated"},
+  "disagree":   {"type": "noul", "noul": 0.631, "where": [110.0, 120.0], "status": "off catalogue"},
+  "topic":      {"type": "choice", "choice": "design",
+                 "probabilities": {"design": 0.5, "money": 0.166, "other": 0.334}, "status": "off catalogue"},
+  "energy":     {"type": "score", "score": 0.828, "probabilities": {"0": 0.426, "1": 0.32, "2": 0.254},
+                 "legend": {"0": "low", "1": "mid", "2": "high"}, "status": "off catalogue"}
 }
 ```
 
-`noul` is the probability of *yes*. When Dodona says 0.8, it is right about 80% of the time.
+How to read it:
+- **`laughs` 0.93, `where` [40, 50]:** Dodona hears laughter, most clearly 40 to 50 s into the piece.
+  A yes/no answer is about its strongest 10 seconds, not the whole recording.
+- **`remote` 0.99:** the word "remote" is said (the meeting designs a remote control).
+- **`n_speakers` "one" (0.43):** choice and score answers are averaged over the 10-second
+  windows, so this is about 10-second stretches, not the meeting: four people take part in it.
+- **`score` 0.828:** the expected level, between 0 (low) and 2 (high); `legend` names them.
+- **`status`:** catalogue questions and words are `calibrated`, so 0.93 means right about 93%
+  of the time. Your own questions are `off catalogue`: answered, not verified.
+- **`result["windows"]`** has the same answers for every 10 seconds, plus how much Dodona's two
+  adapters `disagree` (high means it is guessing).
 
 ## Why Dodona
 
