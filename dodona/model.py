@@ -1,7 +1,7 @@
 """Dodona: a voice-native decision model: ask typed questions about speech, get calibrated probabilities.
 
     from dodona import Dodona
-    model = Dodona()                       # the adapters (~140 MB) + Qwen2-Audio-7B (~16 GB)
+    model = Dodona()                       # the adapters (~135 MB) + Qwen2-Audio-7B (~16 GB)
     result = model.ask("call.wav", {
         "angry":  {"type": "noul", "instructions": "Is the speaker angry?"},
         "refund": {"type": "noul", "word": "refund"},
@@ -9,7 +9,7 @@
                    "criteria": {"refund": "Money back", "help": "Technical help", "other": "Something else"}},
         "anger":  {"type": "score", "instructions": "How angry is the speaker?", "criteria": ["low", "mid", "high"]},
     })
-    result["answers"]["angry"]["noul"]     # 0.82: the angriest 10 seconds, at result["answers"]["angry"]["where"]
+    result["answers"]["angry"]["noul"]     # P(yes) in the angriest 10 seconds, at result["answers"]["angry"]["where"]
 
 The audio is cut into 10-second windows (the length Dodona was trained on). Each window is read
 once and every question is answered on top of it, by reading the probability of each answer
