@@ -133,6 +133,8 @@ pip install "dodona-audio[mcp] @ git+https://github.com/bahadobay/dodona-audio"
 ```
 
 The assistant gets two tools: `list_questions` and `ask` (an audio file and questions as above).
+The server runs Dodona on your own machine, so it needs a CUDA GPU (about 24 GB, see the
+model card). A hosted version that needs no GPU is planned.
 
 ## Limits
 
