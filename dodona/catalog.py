@@ -1,6 +1,6 @@
-"""Turning a Jev-style question into Dodona's prompt, and its raw answer into a calibrated one.
+"""Turning a typed question into Dodona's prompt, and its raw answer into a calibrated one.
 
-Questions come as Jev asks them, by a name you choose:
+Questions come by a name you choose:
   {"type": "noul",   "instructions": "Is the speaker angry?"}                    yes / no
   {"type": "noul",   "instructions": "...", "criteria": {"true": ..., "false": ...}}
   {"type": "choice", "instructions": "...", "criteria": {"refund": "Money back", ...}}

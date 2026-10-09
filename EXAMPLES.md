@@ -1,12 +1,11 @@
-# Dodona — examples
+# Dodona examples
 
 > **The numbers below are illustrative**, written to show the shape of the output. They will be
 > replaced by real outputs of the released model before publishing.
 
-Dodona speaks [Jev](https://flaviocopes.com/jev/)'s question format, with audio instead of text:
-you name each question, say its type (`noul` = yes/no, `choice`, `score`) and get one answer per
+Dodona answers typed questions about audio: you name each question, say its type (`noul` = yes/no, `choice`, `score`) and get one answer per
 name. A question can also be a catalogue name (`"angry": {}`) or a word (`{"type": "noul", "word": "refund"}`):
-those answers are **calibrated** — when Dodona says 80%, it is right about 80% of the time.
+those answers are **calibrated**: when Dodona says 80%, it is right about 80% of the time.
 Questions in your own words are answered too, marked `"off catalogue"`.
 
 ```python
@@ -62,7 +61,7 @@ How to read it:
 
 ## 2. A short voice message (6 seconds)
 
-Under 10 seconds there is one window, and the answers look exactly like Jev's.
+Under 10 seconds there is one window, and its answers are the answers.
 
 ```python
 model.ask("message.wav", {
