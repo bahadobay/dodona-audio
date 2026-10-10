@@ -110,8 +110,8 @@ question that does not fit this table is refused with a message saying what is w
   calibrated by a general map (fitted on rewordings of trained questions), not one fitted to
   your question. Measured on yes/no questions: for concepts Dodona was trained on, your own
   wording works as well as the built-in question ("Is the speaker angry?": AUROC 0.982 against
-  0.974); for new topics the ranking holds and a high yes is a little overconfident (shown 97%,
-  right 89 to 94%). Trust it less when the two adapters disagree. Choice and score questions
+  0.974); for new topics, whether or not they resemble a trained one, the ranking holds (AUROC
+  0.96) and a high yes is a little overconfident (shown 97%, right 89 to 94%). Trust it less when the two adapters disagree. Choice and score questions
   of your own use the same map, not measured.
 - **Any word:** `{"type": "noul", "word": "refund"}`, calibrated for words never seen in training too.
 - **Built-in questions:** `model.questions()` lists the 46 questions Dodona was trained and
