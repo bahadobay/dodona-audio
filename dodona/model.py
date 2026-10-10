@@ -110,8 +110,9 @@ class Dodona:
         self.catalog = Catalog(folder)
         self.processor = AutoProcessor.from_pretrained(BASE)
         base = Qwen2AudioForConditionalGeneration.from_pretrained(BASE, dtype=torch.bfloat16)
-        self.net = PeftModel.from_pretrained(base, folder / ADAPTERS[0], adapter_name=ADAPTERS[0])
-        self.net.load_adapter(folder / ADAPTERS[1], adapter_name=ADAPTERS[1])
+        # load on the CPU, then move: on a ZeroGPU Space there is no GPU until a request comes
+        self.net = PeftModel.from_pretrained(base, folder / ADAPTERS[0], adapter_name=ADAPTERS[0], torch_device="cpu")
+        self.net.load_adapter(folder / ADAPTERS[1], adapter_name=ADAPTERS[1], torch_device="cpu")
         self.net.to(self.device).eval()
         tokenizer = self.processor.tokenizer
         self.letters = [tokenizer.encode(letter, add_special_tokens=False)[0] for letter in LETTERS]
