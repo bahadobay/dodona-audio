@@ -121,7 +121,9 @@ answers, for a timeline. More examples: [EXAMPLES.md](EXAMPLES.md).
 
 ## How well it works
 
-Same test windows, same questions; skill is mean AUROC (balanced accuracy for multiple choice):
+Same test windows, same questions; skill is mean AUROC (balanced accuracy for multiple choice).
+This gives Qwen2-Audio its best chance: its answers are read the way Dodona reads its own, from
+the probability of each answer letter, with its own calibration:
 
 | | Qwen2-Audio alone | Dodona |
 |---|---|---|
@@ -130,6 +132,11 @@ Same test windows, same questions; skill is mean AUROC (balanced accuracy for mu
 | content: topics, questions, numbers | 0.779 | **0.941** |
 | sounds, dialogue acts, voices | 0.693 | **0.869** |
 | was a word said | 0.891 | **0.961** |
+
+Asked the usual way instead (each question its own prompt, the answer generated and its letter
+parsed; balanced accuracy on a sample of 100 windows per corpus), the backbone falls further
+behind: emotion 0.656 against Dodona's 0.946, tone 0.433 against 0.764, content 0.594 against
+0.838, and 1.3% of its answers had no usable letter.
 
 Against a transcript (Whisper large-v3-turbo): on par for whether a word was said (0.907
 against 0.904); a transcript is more accurate on topics defined by keyword lists (the test's labels, which it
