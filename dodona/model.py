@@ -153,7 +153,7 @@ class Dodona:
         n = len(questions)
         endings = [self.processor.tokenizer(t[split:], add_special_tokens=False).input_ids for t in texts]
         longest = max(map(len, endings))
-        ids = torch.full((n, longest), self.processor.tokenizer.pad_token_id)
+        ids = torch.full((n, longest), self.processor.tokenizer.pad_token_id, dtype=torch.long)
         mask = torch.ones(n, n_shared + longest, dtype=torch.long)
         positions = torch.zeros(n, longest, dtype=torch.long)
         for i, e in enumerate(endings):  # left-padded: every row ends at the last column

@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-mcp = ["mcp>=2.3"]
+mcp = ["mcp>=2.3,<3"]  # dodona.mcp_server uses mcp.server.mcpserver (2.x)
 
 [project.scripts]
 dodona-mcp = "dodona.mcp_server:main"

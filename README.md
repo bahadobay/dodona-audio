@@ -69,6 +69,10 @@ How to read it:
 
 - **It hears how, not only what.** Tone, emotion, who is speaking, laughter, hesitation,
   and whether a word was said, all from the audio itself, with no transcript in between.
+- **Your questions, typed answers.** Write the question in plain language and pick its type
+  (yes/no, a choice, a scale). The answer always has that shape, with a probability, and
+  nothing to parse: no prompt engineering, no JSON that sometimes breaks. In our test, a plain
+  audio LLM asked the usual way left 1.3% of its answers without a usable letter.
 - **Many questions, one listen.** The recording is read once and every question is answered
   on top of it, by reading the probability of each answer (no text is generated). Forty
   questions take about four times as long as one, not forty times.
@@ -128,7 +132,8 @@ Same test windows, same questions; skill is mean AUROC (balanced accuracy for mu
 | was a word said | 0.891 | **0.961** |
 
 Against a transcript (Whisper large-v3-turbo): on par for whether a word was said (0.907
-against 0.904); a transcript is more accurate on topics. Dodona adds how and who, with
+against 0.904); a transcript is more accurate on topics defined by keyword lists (the test's labels, which it
+matches by construction). Dodona adds how and who, with
 calibrated probabilities, in the same pass. Trained on English; on Turkish speech, voices and
 words work as well as in English. Full numbers, calibration and limits: the
 [model card](https://huggingface.co/bahadobay/dodona-audio).
