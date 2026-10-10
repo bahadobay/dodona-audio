@@ -109,6 +109,8 @@ question that does not fit this table is refused with a message saying what is w
 - **Your own questions:** write them like the table says. They are answered and marked
   `"off catalogue"`: not tested on your wording. For concepts Dodona was trained on, your own
   wording works as well as the built-in question ("Is the speaker angry?": AUROC 0.982 against 0.974).
+  For new concepts the ranking holds and a high yes is a little overconfident (shown 97%, right
+  89 to 94% on new topics); trust it less when the two adapters disagree.
 - **Any word:** `{"type": "noul", "word": "refund"}`, calibrated for words never seen in training too.
 - **Built-in questions:** `model.questions()` lists the 46 questions Dodona was trained and
   calibrated on. Ask one with its exact wording (`laughs` and `n_speakers` above are two; a
