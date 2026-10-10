@@ -24,6 +24,7 @@ when Dodona says 0.8, it is right about 80% of the time.
 ## 1. Two minutes of a meeting
 
 AMI Meeting Corpus, `ES2002a.Mix-Headset.wav`, 50 to 170 s. Four people design a remote control.
+A test meeting: none of it, and none of its speakers, was in training.
 
 ```python
 result = model.ask("meeting.wav", {
@@ -81,8 +82,9 @@ How to read it:
 
 ## 2. A short angry sentence
 
-CREMA-D, `1001_ITH_ANG_XX.wav` (2.4 s), an actor reading a sentence angrily. Under 10 seconds
-there is one window, and its answers are the answers.
+CREMA-D, `1001_ITH_ANG_XX.wav` (2.4 s), an actor reading a sentence angrily. A test actor,
+never heard in training; CREMA-D's 12 sentences are read by every actor, so the sentence itself
+was. Under 10 seconds there is one window, and its answers are the answers.
 
 ```python
 model.ask("angry.wav", {

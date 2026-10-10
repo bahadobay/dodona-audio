@@ -14,7 +14,8 @@ a probability you can trust.
 
 ## What you send, what you get
 
-Two minutes of a real meeting (AMI corpus, ES2002a, 50 to 170 s), six questions:
+Two minutes of a real meeting (AMI corpus, ES2002a, 50 to 170 s; a test meeting, none of it in
+training), six questions:
 
 ```python
 from dodona import Dodona
