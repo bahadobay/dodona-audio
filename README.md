@@ -10,7 +10,7 @@ a probability you can trust.
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
 
 > At Dodona, the oracle listened to the rustling of an oak and answered the questions brought
-> to it. This one listens to speech.
+> to it.
 
 ## What you send, what you get
 
