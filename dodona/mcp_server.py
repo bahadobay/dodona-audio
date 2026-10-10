@@ -16,7 +16,8 @@ server = MCPServer(
         "Dodona listens to an audio file and answers yes/no, multiple-choice and scale questions "
         "about it with calibrated probabilities. Call list_questions first: when the user's "
         "question means the same as a catalogue question, ask it by its catalogue name with an "
-        "empty spec ({\"angry\": {}}), because only catalogue questions and the word shortcut are calibrated."
+        "empty spec ({\"angry\": {}}): catalogue questions and the word shortcut are calibrated "
+        "question by question, other questions only by a general map."
     ),
 )
 model = None
@@ -53,7 +54,7 @@ def ask(audio_path: str, questions: dict) -> dict:
     Returns {"model", "duration", "answers", "windows"}. A noul answer is the probability of
     "yes" in the recording's highest 10 s window, with "where" that window is; choice and score
     answers are averaged over the windows. Each answer has a "status": "calibrated", "not
-    verified" or "off catalogue" (answered, but its probabilities are not verified)."""
+    verified" or "off catalogue" (calibrated by a general map, not one fitted to the question)."""
     return loaded().ask(audio_path, questions)
 
 

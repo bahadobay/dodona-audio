@@ -15,10 +15,11 @@ Each question has a name you choose and one of three types:
   probability of each option and `score` is the expected level (0 is the first option).
 
 Write your own questions with `instructions` (and `criteria` for choice and score); they are
-answered and marked `"off catalogue"`: not tested on your wording. For the most common
-questions there are built-in shortcuts: ask one by its name (`"angry": {}`) or ask for any word
-(`{"type": "noul", "word": "refund"}`), and the answer is **calibrated**: when Dodona says 0.8,
-it is right about 80% of the time.
+marked `"off catalogue"`: calibrated by a general map, not one fitted to your question (how
+well it holds: the README's "Asking"). For the most common questions there are built-in
+shortcuts: ask one by its name (`"angry": {}`) or ask for any word
+(`{"type": "noul", "word": "refund"}`), and the answer is **calibrated** for that question:
+when Dodona says 0.8, it is right about 80% of the time.
 
 ## 1. Two minutes of a meeting
 

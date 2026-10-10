@@ -60,8 +60,8 @@ How to read it:
   Dodona reads the probability of each option (0.426 low, 0.32 mid, 0.254 high) and the score
   is their weighted average.
 - **`status`:** the built-in questions (`laughs`, `n_speakers`) and words are `calibrated`, so
-  0.93 means right about 93% of the time. Your own questions say `off catalogue`: answered,
-  but not tested on your wording.
+  0.93 means right about 93% of the time. Your own questions say `off catalogue`: calibrated
+  by a general map, not one fitted to your question (measured below).
 - **`result["windows"]`** has the same answers for every 10 seconds, plus how much Dodona's two
   adapters `disagree` (high means it is guessing).
 
@@ -76,9 +76,9 @@ How to read it:
 - **Many questions, one listen.** The recording is read once and every question is answered
   on top of it, by reading the probability of each answer (no text is generated). Forty
   questions take about four times as long as one, not forty times.
-- **Probabilities you can act on.** Catalogue answers are calibrated, so a threshold means what
-  it says. Each answer says whether it is calibrated, and how much Dodona's two halves disagree
-  (high disagreement: it is guessing).
+- **Probabilities you can act on.** Catalogue answers are calibrated question by question, so a
+  threshold means what it says; your own questions use a general map. Each answer says which,
+  and how much Dodona's two halves disagree (high disagreement: it is guessing).
 
 Decision models that answer typed questions about text and images already exist. Dodona does it
 for speech.
@@ -106,11 +106,13 @@ A `score` is an ordered `choice`: Dodona reads the probability of each option, a
 the expected level (0 is the first option). `choice` and `score` take 2 to 8 options. A
 question that does not fit this table is refused with a message saying what is wrong.
 
-- **Your own questions:** write them like the table says. They are answered and marked
-  `"off catalogue"`: not tested on your wording. For concepts Dodona was trained on, your own
-  wording works as well as the built-in question ("Is the speaker angry?": AUROC 0.982 against 0.974).
-  For new concepts the ranking holds and a high yes is a little overconfident (shown 97%, right
-  89 to 94% on new topics); trust it less when the two adapters disagree.
+- **Your own questions:** write them like the table says. They are marked `"off catalogue"`:
+  calibrated by a general map (fitted on rewordings of trained questions), not one fitted to
+  your question. Measured on yes/no questions: for concepts Dodona was trained on, your own
+  wording works as well as the built-in question ("Is the speaker angry?": AUROC 0.982 against
+  0.974); for new topics the ranking holds and a high yes is a little overconfident (shown 97%,
+  right 89 to 94%). Trust it less when the two adapters disagree. Choice and score questions
+  of your own use the same map, not measured.
 - **Any word:** `{"type": "noul", "word": "refund"}`, calibrated for words never seen in training too.
 - **Built-in questions:** `model.questions()` lists the 46 questions Dodona was trained and
   calibrated on. Ask one with its exact wording (`laughs` and `n_speakers` above are two; a

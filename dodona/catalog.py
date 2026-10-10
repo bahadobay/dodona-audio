@@ -9,7 +9,8 @@ Dodona adds two shortcuts:
   {"type": "noul", "word": "refund"}      was this word said (any word; calibrated)
   "angry": {}                             a catalogue question by its name (calibrated)
 A question whose instructions are one of the trained wordings is a catalogue question too.
-Every other question is answered but marked "off catalogue": its calibration is not verified.
+Every other question is marked "off catalogue": calibrated by a general map (fitted on rewordings
+of trained questions), not one fitted to the question.
 """
 
 import json
