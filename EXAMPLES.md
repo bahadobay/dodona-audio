@@ -30,8 +30,7 @@ A test meeting: none of it, and none of its speakers, was in training.
 ```python
 result = model.ask("meeting.wav", {
     "laughs":     {"type": "noul", "instructions": "Someone laughs in this recording."},
-    # a built-in choice question brings its own options: one, two, three_or_more
-    "n_speakers": {"type": "choice", "instructions": "How many distinct speakers are in this recording?"},
+    "several":    {"type": "noul", "instructions": "More than one person speaks in this excerpt."},
     "remote":     {"type": "noul", "word": "remote"},
     "introduce":  {"type": "noul", "instructions": "Does someone introduce themselves?"},
     "topic":      {"type": "choice", "instructions": "What is this meeting about?",
@@ -48,22 +47,19 @@ result = model.ask("meeting.wav", {
   "duration": 120.0,
   "answers": {
     "laughs":     {"type": "noul", "noul": 0.93, "where": [40.0, 50.0], "status": "calibrated"},
-    "n_speakers": {"type": "choice", "choice": "one",
-                   "probabilities": {"one": 0.425, "two": 0.344, "three_or_more": 0.231}, "status": "calibrated"},
+    "several":    {"type": "noul", "noul": 0.958, "where": [80.0, 90.0], "status": "calibrated"},
     "remote":     {"type": "noul", "noul": 0.99, "where": [60.0, 70.0], "status": "calibrated"},
-    "introduce":  {"type": "noul", "noul": 0.909, "where": [20.0, 30.0], "status": "off catalogue"},
+    "introduce":  {"type": "noul", "noul": 0.91, "where": [30.0, 40.0], "status": "off catalogue"},
     "topic":      {"type": "choice", "choice": "design",
-                   "probabilities": {"design": 0.502, "money": 0.167, "other": 0.33}, "status": "off catalogue"},
-    "energy":     {"type": "score", "score": 0.83, "probabilities": {"0": 0.425, "1": 0.32, "2": 0.255},
+                   "probabilities": {"design": 0.504, "money": 0.166, "other": 0.329}, "status": "off catalogue"},
+    "energy":     {"type": "score", "score": 0.827, "probabilities": {"0": 0.426, "1": 0.321, "2": 0.253},
                    "legend": {"0": "low", "1": "mid", "2": "high"}, "status": "off catalogue"}
   },
   "windows": [
     {"start": 0.0, "end": 10.0, "answers": {
       "laughs":     {"type": "noul", "noul": 0.037, "status": "calibrated", "disagreement": 0.015},
-      "n_speakers": {"type": "choice", "choice": "one",
-                     "probabilities": {"one": 0.636, "two": 0.281, "three_or_more": 0.083},
-                     "status": "calibrated", "disagreement": 0.062},
-      "remote":     {"type": "noul", "noul": 0.01, "status": "calibrated", "disagreement": 0.014},
+      "several":    {"type": "noul", "noul": 0.205, "status": "calibrated", "disagreement": 0.034},
+      "remote":     {"type": "noul", "noul": 0.01, "status": "calibrated", "disagreement": 0.015},
       "...": "..."}},
     "... 11 more windows ..."
   ]
@@ -73,13 +69,17 @@ result = model.ask("meeting.wav", {
 How to read it:
 - **A yes/no answer is about its strongest 10 seconds.** `laughs` 0.93 with `where` [40, 50]:
   laughter, most clearly 40 to 50 s into the piece. `remote` 0.99: the word is said, clearest
-  at 60 to 70 s. In the first 10 seconds alone, neither happens (0.037, 0.01). `introduce` 0.909
-  at [20, 30]: the four people introduce themselves around 20 to 40 s. AMI's own annotation
+  at 60 to 70 s. In the first 10 seconds alone, neither happens (0.037, 0.01). `introduce` 0.91
+  at [30, 40]: the four people introduce themselves around 20 to 40 s. AMI's own annotation
   puts the laughter, the word and the introductions in the same places.
-- **Choice and score answers are averages over the windows.** `n_speakers` says "one" (0.425)
-  although four people take part: it describes 10-second stretches, not the meeting.
-- **`score` is the expected level**, 0.83 on a scale from 0 (low) to 2 (high): the
-  probabilities of the three options (0.425, 0.32, 0.255) weighted by their level.
+- **`several` follows who is talking.** It is 0.958 at its strongest. Window by window, it is
+  0.92 to 0.96 in every 10 seconds where AMI's annotation has two or more people speaking and
+  0.30 or less where one person speaks (0.205 in the first window, a monologue). In one window
+  the second person says two words: there it is 0.473, with a high `disagreement` (0.698).
+- **Choice and score answers are averages over the windows.** `topic` "design" (0.504)
+  describes the recording as a whole.
+- **`score` is the expected level**, 0.827 on a scale from 0 (low) to 2 (high): the
+  probabilities of the three options (0.426, 0.321, 0.253) weighted by their level.
 - **`disagreement`**, in each window, is how far Dodona's two adapters are apart. Near 0: they
   agree. High: Dodona is guessing.
 

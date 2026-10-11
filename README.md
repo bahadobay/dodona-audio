@@ -27,8 +27,7 @@ from dodona import Dodona
 model = Dodona()
 result = model.ask("meeting.wav", {
     "laughs":     {"type": "noul", "instructions": "Someone laughs in this recording."},
-    # a built-in choice question brings its own options: one, two, three_or_more
-    "n_speakers": {"type": "choice", "instructions": "How many distinct speakers are in this recording?"},
+    "several":    {"type": "noul", "instructions": "More than one person speaks in this excerpt."},
     "remote":     {"type": "noul", "word": "remote"},  # was this word said? (noul = yes/no)
     "introduce":  {"type": "noul", "instructions": "Does someone introduce themselves?"},
     "topic":      {"type": "choice", "instructions": "What is this meeting about?",
@@ -44,13 +43,12 @@ The real output (`result["answers"]`, 12 windows, run on the demo Space's GPU):
 ```json
 {
   "laughs":     {"type": "noul", "noul": 0.93, "where": [40.0, 50.0], "status": "calibrated"},
-  "n_speakers": {"type": "choice", "choice": "one",
-                 "probabilities": {"one": 0.425, "two": 0.344, "three_or_more": 0.231}, "status": "calibrated"},
+  "several":    {"type": "noul", "noul": 0.958, "where": [80.0, 90.0], "status": "calibrated"},
   "remote":     {"type": "noul", "noul": 0.99, "where": [60.0, 70.0], "status": "calibrated"},
-  "introduce":  {"type": "noul", "noul": 0.909, "where": [20.0, 30.0], "status": "off catalogue"},
+  "introduce":  {"type": "noul", "noul": 0.91, "where": [30.0, 40.0], "status": "off catalogue"},
   "topic":      {"type": "choice", "choice": "design",
-                 "probabilities": {"design": 0.502, "money": 0.167, "other": 0.33}, "status": "off catalogue"},
-  "energy":     {"type": "score", "score": 0.83, "probabilities": {"0": 0.425, "1": 0.32, "2": 0.255},
+                 "probabilities": {"design": 0.504, "money": 0.166, "other": 0.329}, "status": "off catalogue"},
+  "energy":     {"type": "score", "score": 0.827, "probabilities": {"0": 0.426, "1": 0.321, "2": 0.253},
                  "legend": {"0": "low", "1": "mid", "2": "high"}, "status": "off catalogue"}
 }
 ```
@@ -59,18 +57,21 @@ How to read it:
 - **`laughs` 0.93, `where` [40, 50]:** Dodona hears laughter, most clearly 40 to 50 s into the piece.
   A yes/no answer is about its strongest 10 seconds, not the whole recording.
 - **`remote` 0.99:** the word "remote" is said (the meeting designs a remote control).
-- **`introduce` 0.909, `where` [20, 30]:** the four people introduce themselves around 20 to
+- **`several` 0.958, `where` [80, 90]:** more than one person speaks, clearest at 80 to 90 s.
+- **`introduce` 0.91, `where` [30, 40]:** the four people introduce themselves around 20 to
   40 s ("I'm Laura and I'm the project manager", in AMI's transcript). A question of our own.
-- **`n_speakers` "one" (0.425):** choice and score answers are averaged over the 10-second
-  windows, so this is about 10-second stretches, not the meeting: four people take part in it.
-- **`score` 0.83:** the expected level, between 0 (low) and 2 (high); `legend` names them.
-  Dodona reads the probability of each option (0.425 low, 0.32 mid, 0.255 high) and the score
+- **`topic` "design" (0.504):** choice and score answers are averaged over the 10-second
+  windows, so they describe the recording as a whole.
+- **`score` 0.827:** the expected level, between 0 (low) and 2 (high); `legend` names them.
+  Dodona reads the probability of each option (0.426 low, 0.321 mid, 0.253 high) and the score
   is their weighted average.
-- **`status`:** the built-in questions (`laughs`, `n_speakers`) and words are `calibrated`, so
+- **`status`:** the built-in questions (`laughs`, `several`) and words are `calibrated`, so
   0.93 means right about 93% of the time. Your own questions say `off catalogue`: calibrated
   by a general map, not one fitted to your question (measured below).
 - **Checked against AMI's own annotation:** laughter, the word "remote" and the introductions
-  are where Dodona puts them.
+  are where Dodona puts them. `several` is 0.92 to 0.96 in the 10-second windows where two or more
+  people speak and 0.30 or less where one does; in the one window where the second person says
+  only two words, it is 0.47 and the two adapters disagree.
 - **`result["windows"]`** has the same answers for every 10 seconds, plus how much Dodona's two
   adapters `disagree` (high means it is guessing).
 
@@ -124,8 +125,8 @@ question that does not fit this table is refused with a message saying what is w
   of your own use the same map, not measured.
 - **Any word:** `{"type": "noul", "word": "refund"}`, calibrated for words never seen in training too.
 - **Built-in questions:** `model.questions()` lists the 46 questions Dodona was trained and
-  calibrated on. Ask one with its exact wording (`laughs` and `n_speakers` above are two; a
-  choice then brings its own options), or by name alone as a shortcut: `"angry": {}`. Their
+  calibrated on. Ask one with its exact wording (`laughs` and `several` above are two; a
+  built-in choice then brings its own options), or by name alone as a shortcut: `"angry": {}`. Their
   answers are marked `calibrated`.
 
 **Long audio** is read in 10-second windows. A yes/no answer is the most likely window, with
