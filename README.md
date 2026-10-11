@@ -5,9 +5,13 @@
 Ask your audio about what was said, how it was said, and who said it. Every answer comes with
 a probability you can trust.
 
+[![Try it on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20try%20it-demo%20Space-orange)](https://huggingface.co/spaces/bahadobay/dodona)
 [![Model on Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20model-bahadobay%2Fdodona--audio-yellow)](https://huggingface.co/bahadobay/dodona-audio)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 ![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue)
+
+**Try it yourself:** [the Dodona demo](https://huggingface.co/spaces/bahadobay/dodona). Record your
+voice or pick an example, type your own questions, and see the probabilities. No install, free GPU.
 
 > At Dodona, the oracle listened to the rustling of an oak and answered the questions brought
 > to it.
