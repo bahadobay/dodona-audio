@@ -1,7 +1,7 @@
 # Dodona examples
 
-Real outputs of the released model (one NVIDIA L40S), on test recordings Dodona never trained
-on. The audio is not included here; each example names its file in the corpus it comes from.
+Real outputs of the released model on test recordings Dodona never trained on (the meeting on
+one NVIDIA L40S, the two CREMA-D clips on the demo Space's GPU). The audio is not included here; each example names its file in the corpus it comes from.
 
 ```python
 from dodona import Dodona
@@ -82,9 +82,10 @@ How to read it:
 
 ## 2. A short angry sentence
 
-CREMA-D, `1001_ITH_ANG_XX.wav` (2.4 s), an actor reading a sentence angrily. A test actor,
-never heard in training; CREMA-D's 12 sentences are read by every actor, so the sentence itself
-was. Under 10 seconds there is one window, and its answers are the answers.
+CREMA-D, `1006_WSI_ANG_XX.wav` (2.7 s), an actor reading a sentence angrily; 10 of 10 people
+who rated the voice alone heard anger (CREMA-D's own ratings). A test actor, never heard in
+training; CREMA-D's 12 sentences are read by every actor, so the sentence itself was. Under 10
+seconds there is one window, and its answers are the answers.
 
 ```python
 model.ask("angry.wav", {
@@ -99,35 +100,39 @@ model.ask("angry.wav", {
 ```json
 {
   "emotion": {"type": "choice", "choice": "angry",
-              "probabilities": {"angry": 0.972, "happy": 0.009, "sad": 0.005, "neutral": 0.004,
-                                "fear": 0.004, "disgust": 0.006}, "status": "calibrated"},
-  "angry":   {"type": "noul", "noul": 0.99, "where": [0.0, 2.369], "status": "calibrated"},
-  "upset":   {"type": "score", "score": 1.247, "probabilities": {"0": 0.143, "1": 0.466, "2": 0.39},
+              "probabilities": {"angry": 0.969, "happy": 0.01, "sad": 0.004, "neutral": 0.005,
+                                "fear": 0.004, "disgust": 0.008}, "status": "calibrated"},
+  "angry":   {"type": "noul", "noul": 0.978, "where": [0.0, 2.736], "status": "calibrated"},
+  "upset":   {"type": "score", "score": 1.27, "probabilities": {"0": 0.07, "1": 0.589, "2": 0.341},
               "legend": {"0": "calm", "1": "annoyed", "2": "very upset"}, "status": "off catalogue"}
 }
 ```
 
 `emotion` is a `choice` (one of six emotions) and `angry` a `noul` (yes/no); both are built-in
-questions and clear (`angry` 0.99, the two adapters' disagreement 0.0). `upset` is a `score`
-question of our own, and it lands between "annoyed" and "very upset" (1.247). Its window shows
-a disagreement of 0.528: the two adapters answer it differently, so read it as a guess.
+questions and clear (`angry` 0.978, the two adapters' disagreement 0.0). `upset` is a `score`
+question of our own, and it lands just above "annoyed" (1.27). Its window shows a disagreement
+of 0.248, higher than the built-in questions': the two adapters answer it less alike.
 
 ## 3. A short happy sentence
 
-CREMA-D, `1001_WSI_HAP_XX.wav` (2.3 s), the same actor, happily, same questions.
+CREMA-D, `1006_DFA_HAP_XX.wav` (2.3 s), the same actor, happily, same questions; 8 of 9 people
+who rated the voice alone heard happiness.
 
 ```json
 {
   "emotion": {"type": "choice", "choice": "happy",
-              "probabilities": {"angry": 0.002, "happy": 0.974, "sad": 0.005, "neutral": 0.007,
-                                "fear": 0.005, "disgust": 0.007}, "status": "calibrated"},
-  "angry":   {"type": "noul", "noul": 0.01, "where": [0.0, 2.276], "status": "calibrated"},
-  "upset":   {"type": "score", "score": 0.55, "probabilities": {"0": 0.601, "1": 0.247, "2": 0.151},
+              "probabilities": {"angry": 0.002, "happy": 0.983, "sad": 0.003, "neutral": 0.004,
+                                "fear": 0.003, "disgust": 0.005}, "status": "calibrated"},
+  "angry":   {"type": "noul", "noul": 0.01, "where": [0.0, 2.302], "status": "calibrated"},
+  "upset":   {"type": "score", "score": 0.407, "probabilities": {"0": 0.72, "1": 0.152, "2": 0.127},
               "legend": {"0": "calm", "1": "annoyed", "2": "very upset"}, "status": "off catalogue"}
 }
 ```
 
-Emotion was learned from actors reading 12 sentences; on natural speech it is not verified.
+Emotion was learned from actors reading 12 sentences, and it predicts the emotion the actor was
+asked to portray. Listeners do not always hear that emotion in the voice: for an earlier pair of
+clips from another actor, most of the people rating the voice alone heard anger in the "happy"
+one. On natural speech it is not verified.
 
 ## The built-in questions
 

@@ -60,6 +60,9 @@ How to read it:
 - **`score` 0.828:** the expected level, between 0 (low) and 2 (high); `legend` names them.
   Dodona reads the probability of each option (0.426 low, 0.32 mid, 0.254 high) and the score
   is their weighted average.
+- **`disagree` 0.631, `where` [110, 120]:** a false alarm. AMI's own annotation marks no
+  objection anywhere in these two minutes. This is a question of our own (`off catalogue`):
+  answered with a probability, and here wrong.
 - **`status`:** the built-in questions (`laughs`, `n_speakers`) and words are `calibrated`, so
   0.93 means right about 93% of the time. Your own questions say `off catalogue`: calibrated
   by a general map, not one fitted to your question (measured below).
