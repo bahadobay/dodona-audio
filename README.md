@@ -26,7 +26,7 @@ result = model.ask("meeting.wav", {
     # a built-in choice question brings its own options: one, two, three_or_more
     "n_speakers": {"type": "choice", "instructions": "How many distinct speakers are in this recording?"},
     "remote":     {"type": "noul", "word": "remote"},  # was this word said? (noul = yes/no)
-    "disagree":   {"type": "noul", "instructions": "Does someone disagree with another person?"},
+    "introduce":  {"type": "noul", "instructions": "Does someone introduce themselves?"},
     "topic":      {"type": "choice", "instructions": "What is this meeting about?",
                    "criteria": {"design": "Designing a product", "money": "A budget or prices",
                                 "other": "Something else"}},
@@ -35,18 +35,18 @@ result = model.ask("meeting.wav", {
 })
 ```
 
-The real output (`result["answers"]`; one NVIDIA L40S, 12 windows):
+The real output (`result["answers"]`, 12 windows, run on the demo Space's GPU):
 
 ```json
 {
   "laughs":     {"type": "noul", "noul": 0.93, "where": [40.0, 50.0], "status": "calibrated"},
   "n_speakers": {"type": "choice", "choice": "one",
-                 "probabilities": {"one": 0.43, "two": 0.34, "three_or_more": 0.23}, "status": "calibrated"},
+                 "probabilities": {"one": 0.425, "two": 0.344, "three_or_more": 0.231}, "status": "calibrated"},
   "remote":     {"type": "noul", "noul": 0.99, "where": [60.0, 70.0], "status": "calibrated"},
-  "disagree":   {"type": "noul", "noul": 0.631, "where": [110.0, 120.0], "status": "off catalogue"},
+  "introduce":  {"type": "noul", "noul": 0.909, "where": [20.0, 30.0], "status": "off catalogue"},
   "topic":      {"type": "choice", "choice": "design",
-                 "probabilities": {"design": 0.5, "money": 0.166, "other": 0.334}, "status": "off catalogue"},
-  "energy":     {"type": "score", "score": 0.828, "probabilities": {"0": 0.426, "1": 0.32, "2": 0.254},
+                 "probabilities": {"design": 0.502, "money": 0.167, "other": 0.33}, "status": "off catalogue"},
+  "energy":     {"type": "score", "score": 0.83, "probabilities": {"0": 0.425, "1": 0.32, "2": 0.255},
                  "legend": {"0": "low", "1": "mid", "2": "high"}, "status": "off catalogue"}
 }
 ```
@@ -55,17 +55,18 @@ How to read it:
 - **`laughs` 0.93, `where` [40, 50]:** Dodona hears laughter, most clearly 40 to 50 s into the piece.
   A yes/no answer is about its strongest 10 seconds, not the whole recording.
 - **`remote` 0.99:** the word "remote" is said (the meeting designs a remote control).
-- **`n_speakers` "one" (0.43):** choice and score answers are averaged over the 10-second
+- **`introduce` 0.909, `where` [20, 30]:** the four people introduce themselves around 20 to
+  40 s ("I'm Laura and I'm the project manager", in AMI's transcript). A question of our own.
+- **`n_speakers` "one" (0.425):** choice and score answers are averaged over the 10-second
   windows, so this is about 10-second stretches, not the meeting: four people take part in it.
-- **`score` 0.828:** the expected level, between 0 (low) and 2 (high); `legend` names them.
-  Dodona reads the probability of each option (0.426 low, 0.32 mid, 0.254 high) and the score
+- **`score` 0.83:** the expected level, between 0 (low) and 2 (high); `legend` names them.
+  Dodona reads the probability of each option (0.425 low, 0.32 mid, 0.255 high) and the score
   is their weighted average.
-- **`disagree` 0.631, `where` [110, 120]:** a false alarm. AMI's own annotation marks no
-  objection anywhere in these two minutes. This is a question of our own (`off catalogue`):
-  answered with a probability, and here wrong.
 - **`status`:** the built-in questions (`laughs`, `n_speakers`) and words are `calibrated`, so
   0.93 means right about 93% of the time. Your own questions say `off catalogue`: calibrated
   by a general map, not one fitted to your question (measured below).
+- **Checked against AMI's own annotation:** laughter, the word "remote" and the introductions
+  are where Dodona puts them.
 - **`result["windows"]`** has the same answers for every 10 seconds, plus how much Dodona's two
   adapters `disagree` (high means it is guessing).
 
