@@ -153,7 +153,8 @@ behind: emotion 0.656 against Dodona's 0.946, tone 0.433 against 0.764, content 
 0.838, and 1.3% of its answers had no usable letter.
 
 Against a transcript (Whisper large-v3-turbo): on par for whether a word was said (0.907
-against 0.904); a transcript is more accurate on topics defined by keyword lists (the test's labels, which it
+against 0.904), but they miss different words: Dodona hears 48% of the words the transcript
+missed, with 0.3% false alarms, and the two together reach 0.949; a transcript is more accurate on topics defined by keyword lists (the test's labels, which it
 matches by construction). Dodona adds how and who, with
 calibrated probabilities, in the same pass. Trained on English; on Turkish speech, voices and
 words work as well as in English. Full numbers, calibration and limits: the
